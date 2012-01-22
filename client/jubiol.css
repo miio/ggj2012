@@ -1,0 +1,6 @@
+#enchant-stage > div {
+  border: solid 1px #ccc;
+  margin: auto 10px;
+  width : 640px;
+  height: 480px;
+}
