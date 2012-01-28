@@ -7,6 +7,7 @@ class ServerConnectionManager
         @uid = 0
         @inited = false
         @guest_list = []
+        @player_id = 2
         @item
     onConnection : ->
         @socket = io.connect @address
@@ -18,20 +19,21 @@ class ServerConnectionManager
         #@socket.on 'init', (data) => @uid = data.id
     init : (data) ->
         @uid = data.id
+        @player_id = 2
         @inited = true
 
 class Stage extends Group
   constructor : ->
     super
     @map = new Map()
-    @player = new Player Jubiol.config.WIDTH /2 - 16, 288
-    @addChild @player
-    @bullets = new Group()
-    @addChild @bullets
     console.log 'hoge','1'
     @server = new ServerConnectionManager()
     @server.onConnection()
     console.log('connect', @server.connect)
+    @player = new Player Jubiol.config.PLAYER_POSITION[@server.player_id-1].X, Jubiol.config.PLAYER_POSITION[@server.player_id-1].Y
+    @addChild @player
+    @bullets = new Group()
+    @addChild @bullets
     @player.server = @server
     @guest = new GuestPlayerManager()
     @guest.server = @server

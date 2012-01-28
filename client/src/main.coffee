@@ -59,7 +59,13 @@ class Jubiol extends Game
     ],
     INITIAL_LEVEL : 1,
     LAST_LEVEL : 7,
-    LEVEL_TIME : 30
+    LEVEL_TIME : 30,
+    PLAYER_POSITION : [
+        { X : 100, Y : 550, START_X : 0,   AREA_X : 199},
+        { X : 300, Y : 550, START_X : 200, AREA_X : 199},
+        { X : 500, Y : 550, START_X : 400, AREA_X : 199},
+        { X : 700, Y : 550, START_X : 600, AREA_X : 199}
+    ]
   }
   constructor : ->
     super @config.WIDTH, @config.HEIGHT
