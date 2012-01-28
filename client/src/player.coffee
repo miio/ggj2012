@@ -62,12 +62,19 @@ class ItemManager extends Group
         #console.log 'item', @server
         @item = ['a','p','p','l','e']
         @item_obj = []
-        for item in @item
-            @pos = Math.floor(Math.random()*400)+1
-            @item_obj.push new ItemObject(item,@pos,@pos)
-            @addChild @item_obj[@item_obj.length-1]
-        console.log 'ar', @item_obj
+        #for item in @item
+        #    @pos = Math.floor(Math.random()*400)+1
+        #    @item_obj.push new ItemObject(item,@pos,@pos)
+        #    @addChild @item_obj[@item_obj.length-1]
+        #console.log 'ar', @item_obj
     update : (e) ->
+        rand = Math.floor(Math.random()*100)+1
+        if rand < 3
+            console.log 'created'
+            @item_obj.push new ItemObject('a',700,400)
+            @addChild @item_obj[@item_obj.length-1]
+        for item in @item_obj
+            item.update()
         return true
     removeChild : (i) ->
         super i
@@ -90,4 +97,7 @@ class ItemObject extends KawazSprite
     @invincibleTimer = new Timer(45)
     @invincibleTimer.setComplete ->
       @stop()
+
+  update : (e) ->
+      @x -= 3
 
