@@ -1,8 +1,8 @@
 enchant()
 class Jubiol extends Game
   config : {
-    WIDTH : 640,
-    HEIGHT : 480,
+    WIDTH : 800,
+    HEIGHT : 600,
     FPS : 30,
     FONT : 'Helvetica',
     IMAGE_PATH : './client/resources/images/',
