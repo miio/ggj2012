@@ -2,7 +2,7 @@ class ServerConnectionManager
     #@uid : 0
     constructor : ->
         console.log('socket','con')
-        @address = 'http://ww24.info:3000'
+        @address = 'http://ww24.info:64550'
         @connect = 0
         @uid = 0
         @inited = false
