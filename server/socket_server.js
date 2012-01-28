@@ -2,10 +2,18 @@
  * websocket-server
  */
 // Settings
-var    io = require('socket.io').listen(process.env.VMC_APP_PORT || 3000),
-	fs = require('fs'),
-	path = require('path');
+var room_max = 4;
 
+// Require
+var io = require('socket.io').listen(64550),
+    fs = require('fs'),
+    path = require('path');
+
+// Global var
+var users = {},
+    rooms = {};
+
+/* 一時的に停止
 // Error log
 process.on('uncaughtException', function(err) {
 	var	file = path.join(__dirname, 'error.log'),
@@ -19,15 +27,71 @@ process.on('uncaughtException', function(err) {
 	fs.writeSync(fd, str, position, 'utf8');
 	fs.closeSync(fd);
 });
+*/
 
-// Users info
-var users = {};
+// Room
+var new_room = function () {
+	var room;
+	for (var key in rooms) {
+		if (rooms.hasOwnProperty(key)) {
+			room = rooms[key];
+			if (room.counter < room_max && ! room.is_closed) {
+				console.log(room);
+				return key;
+			}
+		}
+	}
+	// Room var
+	var	room_users = {},
+		room_id = String(new Date().getTime()) + ('00' + parseInt(Math.random() * 100, 10)).slice(-3);
+	
+	rooms[room_id] = new function () {
+		var that = this;
+		that.is_closed = false;
+		that.counter = 0;
+		var room = io.of('/' + room_id).on('connection', function (socket) {
+			that.counter++;
+			
+			// Error
+			var error = function (message) {
+				socket.emit('error', {msg: message});
+			};
+			
+			socket.get('user', function (err, user_data) {
+				if (err !== null) error(err);
+				if (user_data === null) error('disconnect');
+				
+				// Initialize
+				room_users[user_data.id] = user_data;
+				room.emit('user_list', room_users);
+				
+				// Chat
+				socket.on('send_message', function (data) {
+					if (data && data.msg) {
+						data.id = user_data.id;
+						socket.broadcast.emit('receive_message', data);
+					} else error('send_messageに失敗しました');
+				});
+				
+				// Disconnect
+				socket.on('disconnect', function () {
+					that.counter--;
+					delete room_users[user_data.id];
+					room.emit('user_list', room_users);
+				});
+			});
+		});
+	}();
+	return room_id;
+};
 
-io.sockets.on('connection', function (socket) {
-	// error
+// Lobby
+var lobby= io.sockets.on('connection', function (socket) {
+    // Error
 	var error = function (message) {
 		socket.emit('error', {msg: message});
 	};
+    
 	// Initialize
 	var user_data = {
 		id			: String(new Date().getTime()) + ('00' + parseInt(Math.random() * 100, 10)).slice(-3),
@@ -35,47 +99,24 @@ io.sockets.on('connection', function (socket) {
 		timestamp	: new Date().getTime()
 	};
 	users[user_data.id] = user_data;
-	io.sockets.emit('user_list', users);
 	socket.emit('init', user_data);
-	// User set
+	lobby.emit('user_list', users);
+	
+	// Add user
 	socket.on('add_user', function (data) {
 		if (data && data.name) {
 			user_data.name = data.name;
-			users[user_data.id] = user_data;
-			io.sockets.emit('user_list', users);
+			//var id = "room";
+			var id = new_room();
+			socket.set('user', user_data, function () {
+				socket.emit('room', {id: id});
+			});
 		} else error('add_userに失敗しました');
 	});
-	// User activity
-	socket.on('user_activity', function (data) {
-		if (data && data.type) {
-			user_data.type = data.type;
-			for (var param in data) {
-				if (data.hasOwnProperty(param)) {
-					user_data[param] = data[param];
-				}
-			}
-			users[user_data.id] = user_data;
-			io.sockets.emit('user_list', users);
-		} else error('user_activityに失敗しました');
-	});
-	// Image share
-	socket.on('send_image', function (data) {
-		if (data && data.img) {
-			data.id = user_data.id;
-			socket.broadcast.emit('receive_image', data);
-			socket.emit('sent_check', {status: '共有されました'});
-		} else error('send_imageに失敗しました');
-	});
-	// Chat
-	socket.on('send_message', function (data) {
-		if (data && data.msg) {
-			data.id = user_data.id;
-			socket.broadcast.emit('receive_message', data);
-		} else error('send_messageに失敗しました');
-	});
+	
 	// Disconnect
 	socket.on('disconnect', function () {
 		delete users[user_data.id];
-		io.sockets.emit('user_list', users);
+		lobby.emit('user_list', users);
 	});
 });
