@@ -6,28 +6,6 @@ class Player extends KawazSprite
     @invincibleTimer = new Timer(45)
     @invincibleTimer.setComplete ->
       @stop()
-  update : (e) ->
-    @invincibleTimer.tick()
-    @opacity = 0.5 + 0.5 * Math.cos(@invincibleTimer.now() * 30 * Math.PI / 180)
-    @v.set 0, 0
-    if Jubiol.game.input.left
-      @v.x = -1
-    else if Jubiol.game.input.right
-      @v.x = 1
-    if Jubiol.game.input.up
-      @v.y = -1
-    else if Jubiol.game.input.down
-      @v.y = 1
-    @v.resize @speed
-    super
-    if @x > Jubiol.config.WIDTH - @width
-      @x = Jubiol.config.WIDTH - @width
-    else if @x < 0
-      @x = 0
-    if @y > Jubiol.config.HEIGHT - @height
-      @y = Jubiol.config.HEIGHT - @height
-    else if @y < 0
-      @y = 0
 
 
 class GuestPlayer extends KawazSprite
@@ -84,9 +62,11 @@ class ItemManager extends Group
         i.y = -10000
     checkHit : (obj) ->
         t = new HitItemObject(obj.x,obj.y)
+        console.log @server
+        user_area = new HitItemObject(Jubiol.config.PLAYER_POSITION[@server.player_id-1].START_X, 400, Jubiol.config.PLAYER_POSITION[@server.player_id-1].AREA_X, 10)
         for item in @item_obj
             console.log t
-            if t.intersect(item)
+            if t.intersect(item) and user_area.intersect(item)
                 console.log 'deleted'
                 @removeChild item
     #update : (e) ->
@@ -99,8 +79,8 @@ class ItemManager extends Group
         #    @guest[user].update()
 
 class HitItemObject extends KawazSprite
-    constructor: (x=0,y=0) ->
-        super 10,10,x,y
+    constructor: (x=0,y=0,w=10,h=10) ->
+        super w,h,x,y
         @setImage "#{name}.gif"
 
 class ItemObject extends KawazSprite
