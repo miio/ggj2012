@@ -69,10 +69,12 @@ class ItemManager extends Group
         #console.log 'ar', @item_obj
     update : (e) ->
         rand = Math.floor(Math.random()*100)+1
-        if rand < 3
-            console.log 'created'
+        if rand < 2
+            console.log Jubiol.config.SUSHI_NETA
             @item_obj.push new ItemObject('a',700,400)
             @addChild @item_obj[@item_obj.length-1]
+
+            @item_obj[@item_obj.length-1].addEventListener "touchend",((obj) => @checkHit obj )
         for item in @item_obj
             item.update()
         return true
@@ -80,6 +82,13 @@ class ItemManager extends Group
         super i
         i.x = -10000
         i.y = -10000
+    checkHit : (obj) ->
+        t = new HitItemObject(obj.x,obj.y)
+        for item in @item_obj
+            console.log t
+            if t.intersect(item)
+                console.log 'deleted'
+                @removeChild item
     #update : (e) ->
     #  for user, val of @server.guest_list
     #    if !@guest[user]?
@@ -88,6 +97,11 @@ class ItemManager extends Group
     #        console.log 'user', user
         #else
         #    @guest[user].update()
+
+class HitItemObject extends KawazSprite
+    constructor: (x=0,y=0) ->
+        super 10,10,x,y
+        @setImage "#{name}.gif"
 
 class ItemObject extends KawazSprite
   constructor: (name,x=0, y=0) ->
