@@ -1,0 +1,34 @@
+{
+	"0"	: {
+		"name"	: "KAWAZ_TAN",
+		"price"	: -500
+	},
+	"1"	: {
+		"name"	: "AMA_EBI",
+		"price"	: 300
+	},
+	"2"	: {
+		"name"	: "HOTATE",
+		"price"	: 300
+	},
+	"3"	: {
+		"name"	: "IKURA",
+		"price"	: 500
+	},
+    "4" : {
+        "name" : "KAPPA_MAKI",
+        "price" : 200
+    },
+    "5" : {
+        "name" : "TAMAGO",
+        "price" : 200
+    },
+    "6" : {
+        "name" : "UNI",
+        "price" : 500
+    },
+    "7" : {
+        "name" : "HEBI",
+        "price" : 100000
+    }
+}

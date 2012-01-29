@@ -114,7 +114,7 @@ var new_room = function () {
 			
 			socket.get('user', function (err, user_data) {
 				if (err !== null) error(err);
-				if (user_data === null || typeof(user_data.id) === "undefined") error('disconnect');
+				if (user_data === null || typeof(user_data.id) === 'undefined') error('disconnect');
 				
 				// Initialize
 				room_users[user_data.id] = user_data;
@@ -175,7 +175,7 @@ var new_room = function () {
                             ret.push({id: room_users[key].id});
                         }
                     }
-					socket.emit("dobon_user_ids", ret);
+					socket.emit('dobon_user_ids', ret);
 				});
 				
 				// Chat
@@ -219,7 +219,6 @@ var lobby= io.sockets.on('connection', function (socket) {
 	socket.on('add_user', function (data) {
 		if (data && data.name) {
 			user_data.name = data.name;
-			//var id = "room";
 			var id = new_room();
 			socket.set('user', user_data, function () {
 				socket.emit('room', {id: id});
