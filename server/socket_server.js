@@ -2,7 +2,8 @@
  * websocket-server
  */
 // Settings
-var room_max = 4;
+var room_max = 4,
+    objects_file = 'sushi.json';
 
 // Require
 var io = require('socket.io').listen(64550),
@@ -11,7 +12,23 @@ var io = require('socket.io').listen(64550),
 
 // Global var
 var users = {},
-    rooms = {};
+    rooms = {},
+	objects = {};
+
+// Global method
+var object_parse = function (obj, keyname) {
+	var a = [],
+		o = {};
+	for (var key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			a[a.length] = key;
+			o[key] = {
+				name	: obj[key][keyname]
+			};
+		}
+	}
+	return {id_array: a, object: o};
+};
 
 /* 一時的に停止
 // Error log
@@ -29,6 +46,10 @@ process.on('uncaughtException', function(err) {
 });
 */
 
+// Load objects
+objects = JSON.parse(fs.readFileSync(path.resolve(objects_file), 'utf8'));
+objects.parse = object_parse(objects, 'name');
+
 // Room
 var new_room = function () {
 	var room;
@@ -43,7 +64,52 @@ var new_room = function () {
 	}
 	// Room var
 	var	room_users = {},
-		room_id = String(new Date().getTime()) + ('00' + parseInt(Math.random() * 100, 10)).slice(-3);
+		room_id = String(new Date().getTime()) + ('00' + parseInt(Math.random() * 100, 10)).slice(-3),
+		stream = new function () {
+			var	that = this,
+				turn = 0,
+				get_lock = true,
+				obj_id;
+			this.send = function (room) {
+				turn++;
+				get_lock = false;
+				var	id_array = objects.parse.id_array,
+					object_id = id_array[Math.floor(Math.random() * id_array.length)];
+				obj_id = object_id;
+				room.emit('object_stream', {
+					turn		: that.turn,
+					object_id	: object_id
+				});
+			};
+			this.get = function (room, user_id, object_id) {
+				if (get_lock) return true;
+				get_lock = true;
+				if (obj_id !== object_id) return false;
+				room_users[user_id].score += objects[object_id].price;
+				room_users[user_id].count++;
+				
+				// Drop out
+				var	obj = room_users,
+					a = [],
+					limit;
+				for (var key in obj) {
+					if (obj.hasOwnProperty(key)) {
+						a[a.length] = {
+							id		: key,
+							count	: obj[key].count
+						};
+					}
+				}
+				a.sort(function (a, b) {
+					return a.count - b.count;
+				});
+				limit = a[a.length].count - 5;
+				
+				
+				room.emit('user_list', room_users);
+				return true;
+			};
+		}();
 	
 	rooms[room_id] = new function () {
 		var that = this;
@@ -59,11 +125,41 @@ var new_room = function () {
 			
 			socket.get('user', function (err, user_data) {
 				if (err !== null) error(err);
-				if (user_data === null) error('disconnect');
+				if (user_data === null || typeof(user_data.id) === "undefined") error('disconnect');
 				
 				// Initialize
 				room_users[user_data.id] = user_data;
+				room_users[user_data.id].score = 0;
+				room_users[user_data.id].count = 0;
+				room_users[user_data.id].alive = true;
 				room.emit('user_list', room_users);
+				
+				// Game start
+				socket.on('game_start', function () {
+					if (! that.is_closed) {
+						var player_count = 0;
+						for (var key in room_users) {
+							if (room_users.hasOwnProperty(key)) {
+								room_users[key].player = ++player_count;
+							}
+						}
+						room.emit('user_list', room_users);
+						
+						that.is_closed = true;
+						// Send object
+						room.emit('get_object', objects.parse.object);
+						
+						stream.send(room);
+					}
+				});
+				
+				// Get sushi
+				socket.on('get_sushi', function (data) {
+					if (data && data.sushi_order_id) {
+						if (! stream.get(room, user_data.id, data.sushi_order_id)) error('get_sushi fatal error!');
+						stream.send(room);
+					} else error('get_sushiに失敗しました。');
+				});
 				
 				// Chat
 				socket.on('send_message', function (data) {
