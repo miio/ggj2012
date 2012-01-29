@@ -23,7 +23,7 @@ class LogoScene extends Scene
 class TitleScene extends Scene
   constructor : ->
     super
-    @label = new Label "Jubiol"
+    @label = new Label "Osushi"
     @label.font = "96px #{Jubiol.config.FONT}"
     @label.color = "#222"
     @label.x = 195
