@@ -25,6 +25,8 @@ class ServerConnectionManager
 class Stage extends Group
   constructor : ->
     super
+    bg = new BackgroundImage()
+    @addChild bg
     #@map = new Map()
     console.log 'hoge','1'
     @server = new ServerConnectionManager()
@@ -86,6 +88,12 @@ class Stage extends Group
     #for bullet in @bullets.childNodes
     #  if bullet.v.isZero()
     #    bullet.v = Jubiol.game.stage.player.center().sub(bullet.position()).resize(bullet.speed)
+
+class BackgroundImage extends KawazSprite
+    constructor: (x=0,y=0,w=800,h=600) ->
+        super w,h,x,y
+        @setImage "main_background.png"
+
 
 class Counter
   constructor : ->

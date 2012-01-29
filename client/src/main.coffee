@@ -37,7 +37,7 @@ class Jubiol extends Game
       'x.gif',
       'y.gif',
       'z.gif',
-
+      'main_background.png',
 
     ],
     SOUND_PATH : './client/resources/sounds/',
