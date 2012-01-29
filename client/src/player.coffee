@@ -47,14 +47,15 @@ class ItemManager extends Group
         #console.log 'ar', @item_obj
     update : (e) ->
         rand = Math.floor(Math.random()*100)+1
-        if rand < 2
-            console.log Jubiol.config.SUSHI_NETA
-            @item_obj.push new ItemObject('a',700,400)
-            @addChild @item_obj[@item_obj.length-1]
+        if rand < 3
+            @item_obj.push [new PlateObject('plate_1',700,340), new ItemObject('sushi_2',700,330)]
+            for item in @item_obj[@item_obj.length-1]
 
-            @item_obj[@item_obj.length-1].addEventListener "touchend",((obj) => @checkHit obj )
-        for item in @item_obj
-            item.update()
+                @addChild item
+                item.addEventListener "touchend",((obj) => @checkHit obj )
+        for item_elem in @item_obj
+            for item in item_elem
+                item.update()
         return true
     removeChild : (i) ->
         super i
@@ -64,11 +65,13 @@ class ItemManager extends Group
         t = new HitItemObject(obj.x,obj.y)
         console.log @server
         user_area = new HitItemObject(Jubiol.config.PLAYER_POSITION[@server.player_id-1].START_X, 400, Jubiol.config.PLAYER_POSITION[@server.player_id-1].AREA_X, 10)
-        for item in @item_obj
-            console.log t
-            if t.intersect(item) and user_area.intersect(item)
-                console.log 'deleted'
-                @removeChild item
+        for item_elem in @item_obj
+            for item in item_elem
+                console.log t
+                if t.intersect(item) and user_area.intersect(item)
+                    console.log 'deleted'
+                    @removeChild item_elem[0]
+                    @removeChild item_elem[1]
     #update : (e) ->
     #  for user, val of @server.guest_list
     #    if !@guest[user]?
@@ -85,13 +88,23 @@ class HitItemObject extends KawazSprite
 
 class ItemObject extends KawazSprite
   constructor: (name,x=0, y=0) ->
-    super 50, 50, x, y
+    super 200, 150, x, y
     @server= null
-    @setImage "#{name}.gif"
+    @setImage "#{name}.png"
     @invincibleTimer = new Timer(45)
     @invincibleTimer.setComplete ->
       @stop()
 
   update : (e) ->
-      @x -= 3
+      @x -= 8
 
+class PlateObject extends KawazSprite
+  constructor: (name,x=0,y=0) ->
+    super 200, 150, x, y
+    @server= null
+    @setImage "#{name}.png"
+    @invincibleTimer = new Timer(45)
+    @invincibleTimer.setComplete ->
+      @stop()
+  update : (e) ->
+      @x -= 8
