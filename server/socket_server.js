@@ -8,11 +8,11 @@ var room_max = 4,
 // Require
 var io = require('socket.io').listen(64550),
     fs = require('fs'),
-    path = require('path');
+	path = require('path');
 
 // Global var
 var users = {},
-    rooms = {},
+	rooms = {},
 	objects = {};
 
 // Global method
@@ -88,23 +88,12 @@ var new_room = function () {
 				room_users[user_id].score += objects[object_id].price;
 				room_users[user_id].count++;
 				
-				// Drop out
-				var	obj = room_users,
-					a = [],
-					limit;
-				for (var key in obj) {
-					if (obj.hasOwnProperty(key)) {
-						a[a.length] = {
-							id		: key,
-							count	: obj[key].count
-						};
+				// Pass count
+				for (var key in room_users) {
+					if (room_users.hasOwnProperty(key) && ! room_users[key].clicked) {
+						room_users[key].pass_count++;
 					}
 				}
-				a.sort(function (a, b) {
-					return a.count - b.count;
-				});
-				limit = a[a.length].count - 5;
-				
 				
 				room.emit('user_list', room_users);
 				return true;
@@ -131,7 +120,8 @@ var new_room = function () {
 				room_users[user_data.id] = user_data;
 				room_users[user_data.id].score = 0;
 				room_users[user_data.id].count = 0;
-				room_users[user_data.id].alive = true;
+				room_users[user_data.id].pass_count = 0;
+				room_users[user_data.id].clicked = false;
 				room.emit('user_list', room_users);
 				
 				// Game start
@@ -147,7 +137,7 @@ var new_room = function () {
 						
 						that.is_closed = true;
 						// Send object
-						room.emit('get_object', objects.parse.object);
+						room.emit('get_object', objects);
 						
 						stream.send(room);
 					}
@@ -156,9 +146,36 @@ var new_room = function () {
 				// Get sushi
 				socket.on('get_sushi', function (data) {
 					if (data && data.sushi_order_id) {
+						room_users[user_data.id].clicked = true;
 						if (! stream.get(room, user_data.id, data.sushi_order_id)) error('get_sushi fatal error!');
 						stream.send(room);
 					} else error('get_sushiに失敗しました。');
+				});
+				
+				// Dobon user
+				socket.on('get_dobon_user_id', function () {
+					var	a = [],
+						max_dobon;
+					for (var key in room_users) {
+						if (room_users.hasOwnProperty(key)) {
+							a[a.length] = {
+								id	  : key,
+								count   : room_users[key].pass_count
+							};
+						}
+					}
+					a.sort(function (x, y) {
+						return x.count - y.count;
+					});
+					max_dobon = a[a.length-1].count;
+					
+					var ret = [];
+                    for (key in room_users) {
+                        if (room_users.hasOwnProperty(key) && (max_dobon - room_users[key].pass_count) >= 5) {
+                            ret.push({id: room_users[key].id});
+                        }
+                    }
+					socket.emit("dobon_user_ids", ret);
 				});
 				
 				// Chat
@@ -183,11 +200,11 @@ var new_room = function () {
 
 // Lobby
 var lobby= io.sockets.on('connection', function (socket) {
-    // Error
+	// Error
 	var error = function (message) {
 		socket.emit('error', {msg: message});
 	};
-    
+	
 	// Initialize
 	var user_data = {
 		id			: String(new Date().getTime()) + ('00' + parseInt(Math.random() * 100, 10)).slice(-3),
