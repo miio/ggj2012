@@ -8,7 +8,7 @@ var room_max = 4,
 // Require
 var io = require('socket.io').listen(64550),
     fs = require('fs'),
-	path = require('path');
+    path = require('path');
 
 // Global var
 var users = {},
@@ -30,7 +30,6 @@ var object_parse = function (obj, keyname) {
 	return {id_array: a, object: o};
 };
 
-/* 一時的に停止
 // Error log
 process.on('uncaughtException', function(err) {
 	var	file = path.join(__dirname, 'error.log'),
@@ -44,7 +43,6 @@ process.on('uncaughtException', function(err) {
 	fs.writeSync(fd, str, position, 'utf8');
 	fs.closeSync(fd);
 });
-*/
 
 // Load objects
 objects = JSON.parse(fs.readFileSync(path.resolve(objects_file), 'utf8'));
@@ -71,11 +69,17 @@ var new_room = function () {
 				get_lock = true,
 				obj_id;
 			this.send = function (room) {
+                var f = arguments.callee;
 				turn++;
+                
 				get_lock = false;
 				var	id_array = objects.parse.id_array,
 					object_id = id_array[Math.floor(Math.random() * id_array.length)];
 				obj_id = object_id;
+                setTimeout( function () {
+                    obj_id = null;
+                    if (! get_lock) f(room);
+                }, 2950);
 				room.emit('object_stream', {
 					turn		: that.turn,
 					object_id	: object_id
