@@ -45,6 +45,8 @@ class ItemManager extends Group
         #    @item_obj.push new ItemObject(item,@pos,@pos)
         #    @addChild @item_obj[@item_obj.length-1]
         #console.log 'ar', @item_obj
+        @sushi_list = new SushiList()
+        @addChild @sushi_list.view
     update : (e) ->
         rand = Math.floor(Math.random()*100)+1
         if rand < 3
@@ -72,6 +74,7 @@ class ItemManager extends Group
                     console.log 'deleted'
                     @removeChild item_elem[0]
                     @removeChild item_elem[1]
+                    @sushi_list.add(1)
     #update : (e) ->
     #  for user, val of @server.guest_list
     #    if !@guest[user]?
@@ -108,3 +111,21 @@ class PlateObject extends KawazSprite
       @stop()
   update : (e) ->
       @x -= 8
+
+class SushiList extends Group
+    constructor: ->
+        @title = "Sushi List<br />"
+        @list = []
+        @view = new Label(@title)
+        @view.x = 600
+        @view.y = 20
+        @view.font = "32px #{Jubiol.config.FONT}"
+    add: (item) ->
+        if @list.length < 3
+            @list.push Jubiol.config.SUSHI_NAME[item]
+        view_text =""
+        for list in @list
+            view_text += "#{list}<br />"
+        @view.text = @title + view_text
+
+
