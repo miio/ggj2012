@@ -25,7 +25,7 @@ class ServerConnectionManager
 class Stage extends Group
   constructor : ->
     super
-    @map = new Map()
+    #@map = new Map()
     console.log 'hoge','1'
     @server = new ServerConnectionManager()
     @server.onConnection()
@@ -46,17 +46,17 @@ class Stage extends Group
     @player.update()
     @guest.update()
     @field_item.update()
-    @levelTimer?.tick()
-    if @levelTimer?.isOver()
-      if @level.level is Jubiol.config.LAST_LEVEL
-        return new ClearState()
-      @changeLevel @level.level + 1
-      Jukebox.play('levelup.wav')
+    #@levelTimer?.tick()
+    #if @levelTimer?.isOver()
+    #  if @level.level is Jubiol.config.LAST_LEVEL
+    #    return new ClearState()
+    #  @changeLevel @level.level + 1
+    #  Jukebox.play('levelup.wav')
     #for item ,val of @field_item.item_obj
-    for item in @field_item.item_obj
-        if @player.intersect(item)
-            @field_item.removeChild item
-            console.log 'col', item
+    #for item in @field_item.item_obj
+    #    if @player.intersect(item)
+    #        @field_item.removeChild item
+    #        console.log 'col', item
 
     #for bullet in @bullets.childNodes.clone()
     #  bullet.update()
@@ -68,23 +68,24 @@ class Stage extends Group
     #      return new CheckState()
     return false
   changeLevel : (lv) ->
-    return if lv > Jubiol.config.LAST_LEVEL
-    levelClass = eval("Level#{lv}")
-    @level = new levelClass(@)
-    label = new Label "Level #{lv}"
-    label.font = "32px #{Jubiol.config.FONT}"
-    label.x = -50
-    label.y = 440
-    label.addEventListener 'enterframe', ->
-      @x += 20
-      if @x > Jubiol.config.WIDTH
-        @parentNode.removeChild @
-    @addChild label
-    @levelTimer = new Timer(Jubiol.config.FPS * Jubiol.config.LEVEL_TIME)
-    @levelTimer.play()
-    for bullet in @bullets.childNodes
-      if bullet.v.isZero()
-        bullet.v = Jubiol.game.stage.player.center().sub(bullet.position()).resize(bullet.speed)
+
+#   return if lv > Jubiol.config.LAST_LEVEL
+#   levelClass = eval("Level#{lv}")
+#   @level = new levelClass(@)
+#   label = new Label "Level #{lv}"
+#   label.font = "32px #{Jubiol.config.FONT}"
+#   label.x = -50
+#   label.y = 440
+#   label.addEventListener 'enterframe', ->
+#     @x += 20
+#      if @x > Jubiol.config.WIDTH
+#        @parentNode.removeChild @
+    #@addChild label
+    #@levelTimer = new Timer(Jubiol.config.FPS * Jubiol.config.LEVEL_TIME)
+    #@levelTimer.play()
+    #for bullet in @bullets.childNodes
+    #  if bullet.v.isZero()
+    #    bullet.v = Jubiol.game.stage.player.center().sub(bullet.position()).resize(bullet.speed)
 
 class Counter
   constructor : ->
