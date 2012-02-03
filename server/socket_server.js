@@ -2,22 +2,22 @@
  * websocket-server
  */
 // Settings
-var room_max = 4,
+var	room_max = 4,
     objects_file = 'sushi.json';
 
 // Require
-var io = require('socket.io').listen(64550),
+var	io = require('socket.io').listen(64550),
     fs = require('fs'),
     path = require('path');
 
 // Global var
-var users = {},
+var	users = {},
 	rooms = {},
 	objects = {};
 
 // Global method
 var object_parse = function (obj, keyname) {
-	var a = [],
+	var	a = [],
 		o = {};
 	for (var key in obj) {
 		if (obj.hasOwnProperty(key)) {
@@ -67,18 +67,29 @@ var new_room = function () {
 			var	that = this,
 				turn = 0,
 				get_lock = true,
-				obj_id;
+				obj_id,
+				timer,
+				pass_count = function (room) {
+					// Pass count
+					for (var key in room_users) {
+						if (room_users.hasOwnProperty(key) && ! room_users[key].clicked) {
+							room_users[key].pass_count++;
+						}
+					}
+					room.emit('user_list', room_users);
+				};
 			this.send = function (room) {
-                var f = arguments.callee;
+				var f = arguments.callee;
 				turn++;
-                
 				get_lock = false;
 				var	id_array = objects.parse.id_array,
 					object_id = id_array[Math.floor(Math.random() * id_array.length)];
 				obj_id = object_id;
-                setTimeout( function () {
-                    obj_id = null;
-                    if (! get_lock) f(room);
+                timer = setTimeout( function () {
+                    if (! get_lock) {
+						pass_count(room);
+						f(room);
+					}
                 }, 2950);
 				room.emit('object_stream', {
 					turn		: that.turn,
@@ -88,18 +99,13 @@ var new_room = function () {
 			this.get = function (room, user_id, object_id) {
 				if (get_lock) return true;
 				get_lock = true;
+				clearTimeout(timer);
 				if (obj_id !== object_id) return false;
 				room_users[user_id].score += objects[object_id].price;
 				room_users[user_id].count++;
 				
-				// Pass count
-				for (var key in room_users) {
-					if (room_users.hasOwnProperty(key) && ! room_users[key].clicked) {
-						room_users[key].pass_count++;
-					}
-				}
+				pass_count(room);
 				
-				room.emit('user_list', room_users);
 				return true;
 			};
 		}();
