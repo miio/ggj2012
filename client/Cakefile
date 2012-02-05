@@ -1,5 +1,8 @@
-sys = require 'util'
-exec = (require 'child_process').exec
+{exec} = require 'child_process'
+coffee = require 'coffee-script'
+util = require 'util'
+yui = require 'yui-compressor'
+fs = require 'fs'
 
 FILENAME = 'jubiol'
 FILES = [
@@ -18,13 +21,16 @@ FILES = [
 ]
 HTMLFILE = 'index.html'
 
-task 'compile', 'compile and minify Jubiol.', (options) ->
-  outputErr = (err, stdout, stderr) ->
-    throw err if err
-    if stdout or stderr
-      console.log "#{stdout} #{stderr}"
-  if FILES.length is 1
-    exec "coffee -c #{FILENAME}.js #{FILES[0]}", outputErr
-  else
-    exec "coffee -cj #{FILENAME} #{FILES.join ' '}", outputErr 
-  exec "yuicompressor #{FILENAME}.js > #{FILENAME}.min.js", outputErr
+
+task 'compile', 'compile and minify Osushi.', (options) ->
+  for file, i in FILES
+    util.log "load [#{i}] #{file}"
+    FILES[i] = fs.readFileSync(file, "utf8")
+  util.log "compile CoffeeScript -> JavaScript"
+  js = coffee.compile FILES.join "\n"
+  util.log "minify (yui-compressor)"
+  yui.compile js, (err, res) ->
+    if err?
+      util.debug err
+    fs.writeFileSync "#{FILENAME}.min.js", res, "utf8"
+    util.log "complete"
