@@ -2,7 +2,7 @@ class ServerConnectionManager
     #@uid : 0
     constructor : ->
         console.log('socket','con')
-        @address = 'http://ggj.devap1.miio.info:64550'
+        @address = ServerConfig.address
         @connect = 0
         @uid = 0
         @inited = false
