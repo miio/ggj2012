@@ -50,7 +50,7 @@ class ItemManager extends Group
     update : (e) ->
         rand = Math.floor(Math.random()*100)+1
         if rand < 3
-            @item_obj.push [new PlateObject('plate_1',700,340), new ItemObject('sushi_2',700,330)]
+            @item_obj.push [new PlateObject('plate_200',700,340), new ItemObject('sushi_2',700,330)]
             for item in @item_obj[@item_obj.length-1]
 
                 @addChild item
