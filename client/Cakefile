@@ -1,6 +1,5 @@
-{exec} = require 'child_process'
 coffee = require 'coffee-script'
-util = require 'util'
+path = require 'path'
 yui = require 'yui-compressor'
 fs = require 'fs'
 
@@ -17,20 +16,22 @@ FILES = [
   'src/state.coffee',
   'src/level.coffee',
   'src/stage.coffee',
-  'src/scene.coffee'
+  'src/scene.coffee',
+  'src/server_config.coffee'
 ]
 HTMLFILE = 'index.html'
 
 
 task 'compile', 'compile and minify Osushi.', (options) ->
   for file, i in FILES
-    util.log "load [#{i}] #{file}"
+    console.log "load [#{i}] #{file}"
     FILES[i] = fs.readFileSync(file, "utf8")
-  util.log "compile CoffeeScript -> JavaScript"
+  console.log "compile CoffeeScript -> JavaScript"
   js = coffee.compile FILES.join "\n"
-  util.log "minify (yui-compressor)"
+  console.log "minify (yui-compressor)"
   yui.compile js, (err, res) ->
     if err?
-      util.debug err
-    fs.writeFileSync "#{FILENAME}.min.js", res, "utf8"
-    util.log "complete"
+      console.error err
+    output = path.resolve "#{options.output or "."}/#{FILENAME}.min.js"
+    fs.writeFile output, res, "utf8", ->
+      console.log "complete"

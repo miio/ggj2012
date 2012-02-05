@@ -1,0 +1,113 @@
+#!/usr/bin/env node
+
+var    util = require('util'),
+	cp = require('child_process'),
+	fs = require('fs'),
+	os = require('os').platform(),
+	argv = process.argv,
+	message = [
+		'Usage: node game [command]',
+		'',
+		'Command:',
+		'  install [address:port]  Game install',
+		'  start                   Game start'
+	].join('\n');
+
+if (typeof(argv[2]) === 'undefined') util.puts('command is required\n\n' + message); else {
+switch (argv[2]) {
+	case 'install':
+		util.log('Wait a minute.');
+		// define command
+		var	server = argv[3] ? argv[3] : 'ggj.devap1.miio.info:64550',
+			port = Number(server.split(':')[1]),
+			c = {
+				cd: {
+					c: 'cd client',
+					s: 'cd server'
+				},
+				npm: 'npm install',
+				cake: 'node node_modules/coffee-script/bin/cake compile'
+			},
+			conf = {
+				index: ['index.html',
+						[
+'<!DOCTYPE HTML>',
+'<html lang="ja,en">',
+'<head>',
+'  <meta charset="UTF-8">',
+'  <script type="text/javascript" src="http://' + server + '/socket.io/socket.io.js"></script>',
+'  <script src="client/lib/enchant.min.js" type="text/javascript"></script>',
+'  <script src="client/jubiol.min.js" type="text/javascript"></script>',
+'  <link media="all" rel="stylesheet" href="client/jubiol.css" type="text/css" />',
+'  <title>Osushi</title>',
+'</head>',
+'<body>',
+'  <div id="enchant-stage"></div>',
+'</body>',
+'</html>'
+						].join('\n')
+					],
+				client: ['client/src/server_config.coffee',
+					'class ServerConfig\n    address: \'http://' + server + '\''
+				],
+				server: ['server/config.json',
+						JSON.stringify({
+							port: port ? port : 80,
+							room_max: 4,
+							objects_file: 'sushi.json'
+						})
+				]
+			},
+			sep = (os.indexOf('win') > -1) ? '&&' : ';';
+		// client install
+		fs.writeFile(conf.index[0], conf.index[1], 'utf8', function (err) {
+			if (err !== null) console.error(err);
+			util.log('output: ' + conf.index[0]);
+		});
+		cp.exec([c.cd.c, c.npm].join(sep), function (error, stdout, stderr) {
+			if (error !== null) return console.log(error);
+			util.print(stdout);
+			util.print(stderr);
+			util.log('[' + [c.cd.c, c.npm].join(sep) + '] finished.');
+			fs.writeFile(conf.client[0], conf.client[1], 'utf8', function (err) {
+				if (err !== null) console.error(err);
+				util.log('output: ' + conf.client[0]);
+				cp.exec([c.cd.c, c.cake].join(sep), function (error, stdout, stderr) {
+					if (error !== null) return console.log(error);
+					util.print(stdout);
+					util.print(stderr);
+					util.log('[' + [c.cd.c, c.cake].join(sep) + '] finished.');
+				});
+			});
+		});
+		// server install
+		fs.writeFile(conf.server[0], conf.server[1], 'utf8', function (err) {
+			if (err !== null) console.error(err);
+			util.log('output: ' + conf.server[0]);
+		});
+		cp.exec([c.cd.s, c.npm].join(sep), function (error, stdout, stderr) {
+			if (error !== null) return console.error(error);
+			util.print(stdout);
+			util.print(stderr);
+			util.log('[' + [c.cd.s, c.npm].join(sep) + '] finished.');
+		});
+		break;
+	case 'start':
+		// exec server
+		var server = cp.fork('server/socket_server.js');
+		server.on('stdout', function (data) {
+			console.log(data);
+		});
+		server.on('stderr', function (data) {
+			console.log(data);
+		});
+		break;
+	case 'help':
+		util.puts(message);
+		break;
+	default:
+		util.puts(argv[2] + ' is not found.\n');
+		util.puts(message);
+		break;
+}
+}

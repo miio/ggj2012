@@ -1,0 +1,7 @@
+node_modules
+Thumbs.db
+.DS_Store
+clinet/jubiol.min.js
+client/src/server_config.coffee
+server/config.json
+server/error.log

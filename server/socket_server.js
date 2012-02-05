@@ -2,16 +2,21 @@
  * websocket-server
  */
 // Settings
-var	room_max = 4,
-    objects_file = 'sushi.json';
+var config_file = 'config.json';
 
 // Require
-var	io = require('socket.io').listen(64550),
-    fs = require('fs'),
-    path = require('path');
+var	fs = require('fs'),
+	path = require('path');
+
+// Load config
+var config = JSON.parse(fs.readFileSync(path.join(__dirname, config_file), 'utf8'));
+
+// Socket.IO
+var io = require('socket.io').listen(config.port);
 
 // Global var
-var	users = {},
+var	room_max = config.room_max,
+	users = {},
 	rooms = {},
 	objects = {};
 
@@ -30,6 +35,10 @@ var object_parse = function (obj, keyname) {
 	return {id_array: a, object: o};
 };
 
+// Load objects
+objects = JSON.parse(fs.readFileSync(path.join(__dirname, config.objects_file), 'utf8'));
+objects.parse = object_parse(objects, 'name');
+
 // Error log
 process.on('uncaughtException', function(err) {
 	var	file = path.join(__dirname, 'error.log'),
@@ -43,10 +52,6 @@ process.on('uncaughtException', function(err) {
 	fs.writeSync(fd, str, position, 'utf8');
 	fs.closeSync(fd);
 });
-
-// Load objects
-objects = JSON.parse(fs.readFileSync(path.resolve(objects_file), 'utf8'));
-objects.parse = object_parse(objects, 'name');
 
 // Room
 var new_room = function () {
