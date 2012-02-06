@@ -21,6 +21,7 @@ FILES = [
 ]
 HTMLFILE = 'index.html'
 
+option "-o", "--output [DIR]", "set output directory"
 
 task 'compile', 'compile and minify Osushi.', (options) ->
   for file, i in FILES
