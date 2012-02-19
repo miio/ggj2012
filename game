@@ -48,7 +48,7 @@ switch (argv[2]) {
 						].join('\n')
 					],
 				client: ['client/src/server_config.coffee',
-					'class ServerConfig\n    address : \'http://' + server + '\''
+					'class ServerConfig\n    @config : {\n       ADDRESS : \'http://' + server + '\'\n    }'
 				],
 				server: ['server/config.json',
 						JSON.stringify({

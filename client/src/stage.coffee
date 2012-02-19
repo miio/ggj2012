@@ -2,7 +2,7 @@ class ServerConnectionManager
     #@uid : 0
     constructor : ->
         console.log('socket','con')
-        @address = ServerConfig.address
+        @address = ServerConfig.config.ADDRESS
         @connect = 0
         @uid = 0
         @inited = false
