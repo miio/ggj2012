@@ -10,6 +10,7 @@ class ServerConnectionManager
         @player_id = 2
         @item
     onConnection : ->
+        console.log @address
         @socket = io.connect @address
         @socket.on 'count', ((count) -> console.log 'count', count.count)
         #@socket.on 'init', @_init(data)
@@ -21,6 +22,19 @@ class ServerConnectionManager
         @uid = data.id
         @player_id = 2
         @inited = true
+        @socket.emit 'add_user', {name:'player'}
+        @socket.on 'room',((data)=>
+            @room_address = "#{@address}/#{data.id}"
+            @room_socket = io.connect @room_address
+            @guest_list = []
+            @room_socket.on 'user_list', ((data) => @guest_list = data)
+            @room_socket.on 'error', ((data) -> @console.log 'error', data)
+            #@room_socket.on 'init', ((data) => @player_id = data)
+            @room_socket.emit 'game_start'
+            @onLobby = true
+            console.log 'user',@guest_list
+            console.log 'connect_room'
+        )
 
 class Stage extends Group
   constructor : ->
