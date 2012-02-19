@@ -47,7 +47,6 @@ class MainState extends State
   constructor : ->
     super
     @stage = @scene.stage
-    @stage.changeLevel Jubiol.config.INITIAL_LEVEL
     Jukebox.play("start.wav")
   setup : ->
     label = new Label ''
@@ -62,7 +61,7 @@ class MainState extends State
     @scene.addChild label
 
   update : ->
-    @scene.counter.update()
+      #@scene.counter.update()
     state = @scene.stage.update()
     if state
       return state

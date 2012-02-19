@@ -1,4 +1,9 @@
 enchant()
+###
+# メインクラス #
+Author : giginet
+Package : Jubiol
+###
 class Jubiol extends Game
   config : {
     WIDTH : 800,

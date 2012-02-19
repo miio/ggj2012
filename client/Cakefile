@@ -12,9 +12,7 @@ FILES = [
   'src/main.coffee',
   'src/sprite.coffee',
   'src/player.coffee',
-  'src/bullet.coffee',
   'src/state.coffee',
-  'src/level.coffee',
   'src/stage.coffee',
   'src/scene.coffee',
   'src/server_config.coffee'
