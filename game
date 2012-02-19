@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
-var    util = require('util'),
+// settings
+var	default_url = 'localhost:8000',
+	deploy_url = 'ggj.devap1.miio.info:8000';
+
+var	util = require('util'),
 	cp = require('child_process'),
 	fs = require('fs'),
 	os = require('os').platform(),
@@ -17,9 +21,17 @@ if (typeof(argv[2]) === 'undefined') util.puts('command is required\n\n' + messa
 switch (argv[2]) {
 	case 'install':
 		util.log('Wait a minute.');
+		
+		// server setting
+		var server = '';
+		if (argv[3] === 'deploy') {
+			server = deploy_url;
+		} else {
+			server = argv[3] ? argv[3] : default_url;
+		}
+		
 		// define command
-		var	server = argv[3] ? argv[3] : 'ggj.devap1.miio.info:64550',
-			port = Number(server.split(':')[1]),
+		var	port = Number(server.split(':')[1]),
 			c = {
 				cd: {
 					c: 'cd client',
