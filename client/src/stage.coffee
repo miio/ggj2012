@@ -9,6 +9,7 @@ class ServerConnectionManager
         @guest_list = []
         @player_id = 2
         @item
+        @object_list
     onConnection : ->
         console.log @address
         @socket = io.connect @address
@@ -34,6 +35,7 @@ class ServerConnectionManager
             @onLobby = true
             console.log 'user',@guest_list
             console.log 'connect_room'
+            @room_socket.on 'get_object',((elem)=>@object_list = elem)
         )
 
 class Stage extends Group
