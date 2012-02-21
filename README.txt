@@ -1,6 +1,7 @@
 *********************************************
 Osushi
 *********************************************
+
 Osushi is a multi player action game at the Merry-go-round sushi store in Japanese.
 
 Players must get some variety of sushies moving on belt conveyor.
@@ -16,4 +17,3 @@ https://github.com/miio/ggj2012
 
 2012/2/22
 TEAM MAG
-
