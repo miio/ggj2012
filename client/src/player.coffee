@@ -1,8 +1,9 @@
 class Player extends KawazSprite
     ###
     # 自身のプレーヤ管理クラス #
-    # Author : giginet
-    # Package : Jubiol
+    # Author : miio mitani <info@miio.info>
+    # Package : Osushi
+    # Licence : GNU Lesser General Public License v3 (http://www.gnu.org/licenses/)
     ###
     constructor: (x=0, y=0) ->
         super 32, 32, x, y

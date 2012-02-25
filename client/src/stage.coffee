@@ -48,12 +48,13 @@ class ServerConnectionManager
         )
 
 class Stage extends Group
+    ###
+    # ステージクラス #
+    # Author : miio mitani <info@miio.info>
+    # Package : Osushi
+    # Licence : GNU Lesser General Public License v3 (http://www.gnu.org/licenses/)
+    ###
     constructor : ->
-        ###
-        # ステージクラス #
-        # Author : giginet
-        # Package : Jubiol
-        ###
         super
         bg = new BackgroundImage()
         @addChild bg
@@ -63,8 +64,6 @@ class Stage extends Group
         console.log('connect', @server.connect)
         @player = new Player Jubiol.config.PLAYER_POSITION[@server.player_id-1].X, Jubiol.config.PLAYER_POSITION[@server.player_id-1].Y
         @addChild @player
-        @bullets = new Group()
-        @addChild @bullets
         @player.server = @server
         @guest = new GuestPlayerManager()
         @guest.server = @server
