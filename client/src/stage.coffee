@@ -114,15 +114,19 @@ class RoomModel extends SocketModel
             @room_socket.on 'error', ((data) => console.log 'room_model_socket_error', data)
             @onLobby = true
             console.log 'connect_room'
+#            @room_socket.emit 'game_start'
+#            @room_socket.emit 'get_object', ((elem)=>@object_list = elem)
         )
     setPlayerList : (data) ->
         @guest_list = data
         @setMyUserPosition data
         console.log 'all_user', @guest_list
-        console.log 'size', @guest_list.length
-        if data.length >= 2 #暫定2
+#        console.log 'size', @guest_list.length
+#if data.length >= 2 #暫定2
+        unless @onReady
             @room_socket.emit 'game_start'
             @room_socket.on 'get_object', ((elem)=>@object_list = elem)
+            @onReady = true
     setMyUserPosition : (data) ->
         for user,val of data
             console.log val.player
