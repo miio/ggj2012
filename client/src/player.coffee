@@ -60,7 +60,7 @@ class ItemManager extends Group
         @addChild @sushi_list.view
     update : (e) ->
         if !@socketFlg
-            @server.room_socket.on 'get_object',((elem)=>console.log elem)# ((elem)=>@object_list = elem)
+            @server.room_socket.on 'get_object',((elem)=>console.log 'get_object', elem)# ((elem)=>@object_list = elem)
             if @server.object_list?
                 @server.room_socket.on 'object_stream', ((elem)=>@createSushi elem)
                 @socketFlg=true
@@ -92,8 +92,7 @@ class ItemManager extends Group
                 console.log t
                 if t.intersect(item) and user_area.intersect(item)
                     console.log 'deleted'
-                    @removeChild item_elem[0]
-                    @removeChild item_elem[1]
+                    @deleteSushi item_elem
                     @server.room_socket.emit 'get_sushi' , { sushi_order_id : item_elem[1].object_id}
                     @sushi_list.add(item_elem[1].object_id)
     createSushi : (elem) ->
@@ -109,6 +108,9 @@ class ItemManager extends Group
             @addChild item
             item.addEventListener "touchend",((obj) => @checkHit obj )
         #Jukebox.play('show_sushi.wav')
+    deleteSushi : (elem) ->
+        @removeChild elem[0]
+        @removeChild elem[1]
 
 class HitItemObject extends KawazSprite
     ###
