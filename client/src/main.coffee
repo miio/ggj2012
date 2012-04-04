@@ -14,6 +14,8 @@ class Jubiol extends Game
     IMAGES : [
       'player.png',
       'kawaz.png',
+      'get_true.png',
+      'get_false.png',
       'main_background.png',
       'plate_200.png',
       'plate_300.png',

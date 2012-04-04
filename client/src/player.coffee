@@ -90,11 +90,19 @@ class ItemManager extends Group
         for item_elem in @item_obj
             for item in item_elem
                 console.log t
-                if t.intersect(item) and user_area.intersect(item)
+                if t.intersect(item)# and user_area.intersect(item)
                     console.log 'deleted'
                     @deleteSushi item_elem
                     @server.room_socket.emit 'get_sushi' , { sushi_order_id : item_elem[1].object_id}
                     @sushi_list.add(item_elem[1].object_id)
+                    ###
+                    # TODO : サーバ側の判定がないのでモック代わりにランダムで判定させる
+                    ###
+                    result = Math.floor Math.random() * 2
+                    if result is 1
+                        @addChild new GetTrueImageObject @
+                    else
+                        @addChild new GetFalseImageObject @
     createSushi : (elem) ->
         ###
         # 寿司生成メソッド
@@ -140,7 +148,7 @@ class ItemObject extends KawazSprite
         @invincibleTimer.setComplete ->
             @stop()
     update : (e) ->
-        @x -= 8
+        @x -= 28
 
 class PlateObject extends ItemObject
     ###
@@ -151,6 +159,49 @@ class PlateObject extends ItemObject
     ###
     constructor: (price,x=0,y=0) ->
         super "plate_#{price}", x, y
+
+class AbstractJudgeObject extends KawazSprite
+    ###
+    # 寿司取得時の判定時の画像の基底クラス
+    # Author : miio mitani <info@miio.info>
+    # Package ; Osushi
+    # Licence : GNU Lesser General Public License v3 (http://www.gnu.org/licenses/)
+    ###
+    constructor : (mediator, name) ->
+        ###
+        # TODO : 画面サイズから算出させたほうがいいと思うのです
+        ###
+        super 300,300, 200, 200
+        @setImage "#{name}.png"
+        @timer = new Timer 3
+        @mediator = mediator
+#¥        @timer.play
+        @timer.setComplete ->
+            console.log 'timer_end_get_sushi'
+            @mediator.removeChild @
+        @timer.play()
+    update : (e) ->
+        @timer.tick()
+
+class GetTrueImageObject extends AbstractJudgeObject
+    ###
+    # 寿司取得時に取得できたときの画像オブジェクトクラス
+    # Author : miio mitani <info@miio.info>
+    # Package : Osushi
+    # Licence : GNU Lesser General Public License v3 (http://www.gnu.org/licenses/)
+    ###
+    constructor : (mediator) ->
+        super mediator, "get_true"
+
+class GetFalseImageObject extends AbstractJudgeObject
+    ###
+    # 寿司取得時に取得できなかったときの画像オブジェクトクラス
+    # Author : miio mitani <info@miio.info>
+    # Package : Osushi
+    # License : GNU Lesser General Public License v3 (http://www.gnu.org/licenses/)
+    ###
+    constructor : (mediator) ->
+        super mediator, "get_false"
 
 class SushiObject extends ItemObject
     ###
