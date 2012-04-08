@@ -30,7 +30,14 @@ class Jubiol extends Game
       'sushi_5.png',
       'sushi_6.png',
       'sushi_7.png',
-
+      'player1.png',
+      'player2.png',
+      'player3.png',
+      'player4.png',
+      'player1on.png',
+      'player2on.png',
+      'player3on.png',
+      'player4on.png'
     ],
     SOUND_PATH : './client/resources/sounds/',
     SOUNDS : [
@@ -41,10 +48,10 @@ class Jubiol extends Game
     LAST_LEVEL : 7,
     LEVEL_TIME : 30,
     PLAYER_POSITION : [
-        { X : 100, Y : 550, START_X : 0,   AREA_X : 199},
-        { X : 300, Y : 550, START_X : 200, AREA_X : 199},
-        { X : 500, Y : 550, START_X : 400, AREA_X : 199},
-        { X : 700, Y : 550, START_X : 600, AREA_X : 199}
+        { X : 0, Y : 490, START_X : 0,   AREA_X : 199},
+        { X : 200, Y : 490, START_X : 200, AREA_X : 199},
+        { X : 400, Y : 490, START_X : 400, AREA_X : 199},
+        { X : 600, Y : 490, START_X : 600, AREA_X : 199}
     ]
   }
   constructor : ->

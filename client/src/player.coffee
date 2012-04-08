@@ -5,10 +5,15 @@ class Player extends KawazSprite
     # Package : Osushi
     # Licence : GNU Lesser General Public License v3 (http://www.gnu.org/licenses/)
     ###
-    constructor: (x=0, y=0) ->
-        super 32, 32, x, y
-        @server= null
-        @setImage 'player.png'
+    constructor: (id = 1, create_self_marker = false) ->
+        x = Jubiol.config.PLAYER_POSITION[id - 1].X
+        y = Jubiol.config.PLAYER_POSITION[id - 1].Y
+        super 200, 110 , x, y
+        console.log 'marker?', create_self_marker
+        if create_self_marker
+            @setImage "player#{id}on.png"
+        else
+            @setImage "player#{id}.png"
 
 class GuestPlayer extends KawazSprite
     ###
@@ -18,10 +23,11 @@ class GuestPlayer extends KawazSprite
     # Package : Kwing.net
     # Licence : GNU Lesser General Public License v3 (http://www.gnu.org/licenses/)
     ###
-    constructor: (x=0, y=0) ->
-        super 32, 32, x, y
-        @server= null
-        @setImage 'player.png'
+    constructor: (id = 1) ->
+        x = Jubiol.config.PLAYER_POSITION[id-1].X
+        y = Jubiol.config.PLAYER_POSITION[id-1].Y
+        super 200, 110 , x, y
+        @setImage "player#{id}.png"
 
 class GuestPlayerManager extends Group
     ###
@@ -38,8 +44,8 @@ class GuestPlayerManager extends Group
     update : (e) ->
         if @server?
             for user, val of @server.guest_list
-                if !@guest[user]?
-                    @guest[user] = new GuestPlayer
+                if !@guest[user]? and @server.player_id not user.player
+                    @guest[user] = new GuestPlayer user.player
                     @addChild @guest[user]
                     console.log 'user', user
 

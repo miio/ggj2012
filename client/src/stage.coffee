@@ -202,9 +202,11 @@ class Stage extends Group
         @inited = false
     update : (e) ->
         if @server.onLobby and @server.onReady and !@inited
-            @player = new Player Jubiol.config.PLAYER_POSITION[@server.player_id-1].X, Jubiol.config.PLAYER_POSITION[@server.player_id-1].Y
+            @player = new Player @server.player_id
+            @player_marker = new Player @server.player_id, true
             @addChild @player
             @player.server = @server
+            @addChild @player_marker
             @guest = new GuestPlayerManager()
             @guest.server = @server
             @addChild @guest
@@ -213,8 +215,7 @@ class Stage extends Group
             @inited = true
             console.log 'inited stage'
         else if @inited
-            @player.update()
-            @guest.update()
+#            @guest.update()
             @field_item.update()
             console.log 'update'
         return false
