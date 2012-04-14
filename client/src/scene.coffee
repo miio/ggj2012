@@ -33,63 +33,53 @@ class TitleScene extends Scene
     ###
     constructor : ->
         super
-        @label = new Label "Osushi"
-        @label.font = "96px #{Jubiol.config.FONT}"
-        @label.color = "#222"
-        @label.x = 195
-        @label.y = -50
-        @addEventListener 'enterframe', @update
-        @timer = new Timer(50)
-        @timer.play()
-        scene = @
-        @timer.setComplete ->
-            play = new Label "Play"
-            howto = new Label "Howto"
-            kawaz = new Label "Kawaz"
-            cursor = new Label ">"
-            play.x = 295
-            play.y = 240
-            howto.x = 285
-            howto.y = 300
-            kawaz.x = 280
-            kawaz.y = 360
-            cursor.x = 240
-            cursor.y = 240
-            cursor.addEventListener 'enterframe', ->
-                @menu ?= 0
-                @press ?= false
-                if Jubiol.game.input.down
-                    unless @press
-                        @press = true
-                        ++@menu
-                else if Jubiol.game.input.up
-                    unless @press
-                        @press = true
-                        --@menu
-                else if Jubiol.game.input.a
-                    return if @press
+        @kawaz = new KawazSprite(Jubiol.config.WIDTH, Jubiol.config.HEIGHT)
+        @kawaz.setImage 'title_background.png'
+        @kawaz.x = 0
+        @kawaz.y = 0
+        @addChild @kawaz
+        play = new Label "Play"
+        howto = new Label "Howto"
+        kawaz = new Label "Kawaz"
+        cursor = new Label ">"
+        play.x = (Jubiol.config.WIDTH / 2) - 55
+        play.y = (Jubiol.config.HEIGHT / 2) + 60
+        howto.x = (Jubiol.config.WIDTH / 2) - 65
+        howto.y = (Jubiol.config.HEIGHT / 2) + 120
+        kawaz.x = (Jubiol.config.WIDTH / 2) - 70
+        kawaz.y = (Jubiol.config.HEIGHT / 2) + 180
+        cursor.x = (Jubiol.config.WIDTH / 2) - 100
+        cursor.y = (Jubiol.config.HEIGHT / 2) + 60
+        cursor.addEventListener 'enterframe', ->
+            @menu ?= 0
+            @press ?= false
+            if Jubiol.game.input.down
+                unless @press
                     @press = true
-                    if @menu is 0
-                        Jubiol.game.replaceScene(new MainScene())
-                    else if @menu is 1
-                        window.open "http://www.kawaz.org/projects/jubiol/"
-                    else if @menu is 2
-                        window.open "http://www.kawaz.org/"
-                else
-                    @press = false
-                @menu = (@menu + 3) % 3
-                @y = 240 + 60 * @menu
-            [play, howto, kawaz, cursor].each (v, i) ->
-                v.font = "36px #{Jubiol.config.FONT}"
-            scene.addChild play
-            scene.addChild howto
-            scene.addChild kawaz
-            scene.addChild cursor
-        @addChild @label
-    update : ->
-        @timer.tick()
-        unless @timer.isOver()
-            @label.y = -50 + 3 * @timer.now()
+                    ++@menu
+            else if Jubiol.game.input.up
+                unless @press
+                    @press = true
+                    --@menu
+            else if Jubiol.game.input.a
+                return if @press
+                @press = true
+                if @menu is 0
+                    Jubiol.game.replaceScene(new MainScene())
+                else if @menu is 1
+                    window.open "http://www.kawaz.org/projects/osushi/"
+                else if @menu is 2
+                    window.open "http://www.kawaz.org/"
+            else
+                @press = false
+            @menu = (@menu + 3) % 3
+            @y = ((Jubiol.config.HEIGHT / 2) + 60) + 60 * @menu
+        [play, howto, kawaz, cursor].each (v, i) ->
+            v.font = "36px #{Jubiol.config.FONT}"
+        @addChild play
+        @addChild howto
+        @addChild kawaz
+        @addChild cursor
 
 
 class MainScene extends Scene
